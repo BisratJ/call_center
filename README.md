@@ -2,11 +2,11 @@
 
 A professional analytics dashboard for tracking and visualizing call center performance metrics at ALX Ethiopia.
 
-## 📊 Overview
+## Overview
 
 This interactive dashboard provides comprehensive insights into call center operations, helping teams monitor outreach effectiveness, analyze contact outcomes, and track engagement across multiple programs.
 
-## ✨ Features
+## Features
 
 - **Real-time Metrics**: Track total calls, reach rates, unique contacts, and engagement levels
 - **Monthly Performance**: Visualize trends and compare performance across different time periods
@@ -87,4 +87,4 @@ The dashboard is fully responsive and adapts to different screen sizes:
 
 ---
 
-**Built with ❤️ for data-driven decision making**
+**Built for data-driven decision making**
