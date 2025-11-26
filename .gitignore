@@ -12,18 +12,8 @@ August/
 *.xlsx
 *.xls
 
-# Exclude analysis outputs
-*.csv
-*.txt
+# Exclude analysis folders
+docs/
+analyse/
 
-# Exclude Python scripts (keep only the dashboard)
-data_analysis.py
-comprehensive_call_outcomes_analysis.py
-corrected_call_analysis.py
-detailed_analysis_with_outcomes.py
-
-# Exclude markdown reports
-COMPREHENSIVE_SUMMARY_REPORT.md
-FINAL_CALL_OUTCOMES_REPORT.md
-
-# Keep only the Call center summary website folder
+# Keep only the dashboard files (index.html, README.md, vercel.json)
