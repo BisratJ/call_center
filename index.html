@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALX Call Center Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary: #2563eb;
+        --primary-light: #60a5fa;
+        --secondary: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-500: #6b7280;
+        --gray-700: #374151;
+        --gray-900: #111827;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--gray-50);
+        color: var(--gray-900);
+        overflow-x: hidden;
+      }
+
+      /* Smooth Scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .slide-in-left {
+        animation: slideInLeft 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .slide-in-right {
+        animation: slideInRight 0.6s ease-out forwards;
+        opacity: 0;
+      }
+
+      .scale-in {
+        animation: scaleIn 0.5s ease-out forwards;
+        opacity: 0;
+      }
+
+      /* Stagger Animation */
+      .stagger-1 {
+        animation-delay: 0.1s;
+      }
+      .stagger-2 {
+        animation-delay: 0.2s;
+      }
+      .stagger-3 {
+        animation-delay: 0.3s;
+      }
+      .stagger-4 {
+        animation-delay: 0.4s;
+      }
+      .stagger-5 {
+        animation-delay: 0.5s;
+      }
+      .stagger-6 {
+        animation-delay: 0.6s;
+      }
+
+      /* Hero Section */
+      .hero {
+        background: linear-gradient(
+          135deg,
+          #1e40af 0%,
+          #3b82f6 50%,
+          #60a5fa 100%
+        );
+        color: white;
+        padding: 40px 24px 60px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>')
+          repeat;
+        opacity: 0.5;
+      }
+
+      .hero-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+      }
+
+      .hero-subtitle {
+        font-size: 16px;
+        opacity: 0.95;
+        margin-bottom: 24px;
+      }
+
+      .hero-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .hero-stat {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 16px 24px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s;
+      }
+
+      .hero-stat:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-4px);
+      }
+
+      .hero-stat-value {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+
+      .hero-stat-label {
+        font-size: 12px;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1400px;
+        margin: -40px auto 0;
+        padding: 0 24px 60px;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* Section */
+      .section {
+        margin-bottom: 32px;
+      }
+
+      .section-header {
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 6px;
+      }
+
+      .section-description {
+        font-size: 14px;
+        color: var(--gray-500);
+        line-height: 1.5;
+      }
+
+      /* Cards */
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+        border: 1px solid var(--gray-200);
+      }
+
+      .card:hover {
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+      }
+
+      /* Grid Layouts */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+
+      /* Stat Cards */
+      .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 3px solid var(--primary);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: var(--primary);
+        opacity: 0.05;
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+      }
+
+      .stat-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+      }
+
+      .stat-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      }
+
+      .stat-info h3 {
+        font-size: 12px;
+        color: var(--gray-500);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .stat-value {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: 6px;
+      }
+
+      .stat-change {
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 12px;
+        border-radius: 6px;
+        background: #dcfce7;
+        color: #15803d;
+      }
+
+      .stat-change.down {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      /* Story Cards */
+      .story-card {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        border: 2px solid #bae6fd;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .story-card::before {
+        content: "";
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(
+          135deg,
+          rgba(12, 74, 110, 0.1),
+          rgba(14, 116, 144, 0.1)
+        );
+        border-radius: 50%;
+      }
+
+      .story-card h2 {
+        font-size: 20px;
+        color: #0c4a6e;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .story-card p {
+        font-size: 14px;
+        color: #0e7490;
+        line-height: 1.5;
+        margin-bottom: 8px;
+      }
+
+      /* Data Table */
+      .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+
+      thead {
+        background: var(--gray-50);
+      }
+
+      th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gray-700);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--gray-200);
+      }
+
+      td {
+        padding: 12px 16px;
+        font-size: 13px;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+      }
+
+      tbody tr {
+        transition: background 0.2s;
+      }
+
+      tbody tr:hover {
+        background: var(--gray-50);
+      }
+
+      /* Progress Bar */
+      .progress-container {
+        width: 100%;
+        height: 8px;
+        background: var(--gray-200);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        border-radius: 10px;
+        transition: width 1s ease-out;
+        animation: progressAnimation 1.5s ease-out;
+      }
+
+      @keyframes progressAnimation {
+        from {
+          width: 0;
+        }
+      }
+
+      /* Badge */
+      .badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .badge-primary {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .badge-success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .badge-warning {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge-danger {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      /* Chart Container */
+      .chart-wrapper {
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--gray-200);
+        height: 100%;
+      }
+
+      .chart-header {
+        margin-bottom: 24px;
+      }
+
+      .chart-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 4px;
+      }
+
+      .chart-subtitle {
+        font-size: 14px;
+        color: var(--gray-500);
+      }
+
+      /* Insight Cards */
+      .insight-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+
+      .insight-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        border: 2px solid var(--gray-200);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .insight-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(
+          180deg,
+          var(--primary),
+          var(--primary-light)
+        );
+      }
+
+      .insight-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+        transform: translateY(-4px);
+      }
+
+      .insight-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: var(--primary);
+        color: white;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      .insight-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 10px;
+      }
+
+      .insight-text {
+        font-size: 14px;
+        color: var(--gray-600);
+        line-height: 1.6;
+      }
+
+      /* Timeline */
+      .timeline {
+        position: relative;
+        padding-left: 40px;
+      }
+
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(
+          180deg,
+          var(--primary),
+          var(--primary-light)
+        );
+      }
+
+      .timeline-item {
+        position: relative;
+        padding-bottom: 32px;
+      }
+
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -35px;
+        top: 5px;
+        width: 15px;
+        height: 15px;
+        background: white;
+        border: 3px solid var(--primary);
+        border-radius: 50%;
+      }
+
+      .timeline-content {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid var(--gray-200);
+      }
+
+      .timeline-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: 8px;
+      }
+
+      .timeline-text {
+        font-size: 14px;
+        color: var(--gray-600);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .grid-2,
+        .grid-3,
+        .grid-4 {
+          grid-template-columns: 1fr;
+        }
+        .hero h1 {
+          font-size: 36px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          padding: 40px 20px 60px;
+        }
+        .hero h1 {
+          font-size: 28px;
+        }
+        .hero-subtitle {
+          font-size: 16px;
+        }
+        .hero-stats {
+          gap: 16px;
+        }
+        .section-title {
+          font-size: 22px;
+        }
+        .container {
+          padding: 0 16px 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="hero-content">
+        <h1 class="fade-in-up">Call Center Performance Dashboard</h1>
+        <p class="hero-subtitle fade-in-up stagger-1">
+          January - August 2025 | 8-Month Comprehensive Analysis
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat scale-in stagger-2">
+            <div class="hero-stat-value">88,425</div>
+            <div class="hero-stat-label">Total Calls Made</div>
+          </div>
+          <div class="hero-stat scale-in stagger-3">
+            <div class="hero-stat-value">63.6%</div>
+            <div class="hero-stat-label">Reach Rate</div>
+          </div>
+          <div class="hero-stat scale-in stagger-4">
+            <div class="hero-stat-value">25,365</div>
+            <div class="hero-stat-label">Unique Contacts</div>
+          </div>
+          <div class="hero-stat scale-in stagger-5">
+            <div class="hero-stat-value">12.8%</div>
+            <div class="hero-stat-label">Interest Rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Story Introduction -->
+      <div class="story-card fade-in-up">
+        <h2>Overview</h2>
+        <p>From January through August 2025, our call center team successfully conducted <strong>88,425 calls</strong> reaching <strong>25,365 unique contacts</strong> across 8 months of operations. With an impressive <strong>63.6% reach rate</strong>, we engaged thousands of prospective learners across multiple programs. Among those reached, <strong>12.8% expressed continued interest</strong> in enrollment, while 5.1% were actively considering their options. This comprehensive analysis reveals strong operational effectiveness with January achieving the highest reach rate of 72.0%, demonstrating the quality-focused approach that drives our success.</p>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="section">
+        <div class="section-header fade-in-up">
+          <h2 class="section-title">Executive Snapshot</h2>
+          <p class="section-description">
+            Real-time performance indicators across all operations
+          </p>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card fade-in-up stagger-1">
+            <div class="stat-card-header">
+              <div class="stat-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Total Contacts Reached</h3>
+              </div>
+            </div>
+            <div class="stat-value">56,257</div>
+            <span class="stat-change">↑ 63.6% Success Rate</span>
+          </div>
+
+          <div class="stat-card fade-in-up stagger-2">
+            <div class="stat-card-header">
+              <div class="stat-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path
+                    d="M12 6v12M15 9H9.5a2.5 2.5 0 0 0 0 5h5a2.5 2.5 0 0 1 0 5H9"
+                  ></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Engaged Prospects</h3>
+              </div>
+            </div>
+            <div class="stat-value">10,028</div>
+            <span class="stat-change">17.9% of reached showed interest</span>
+          </div>
+
+          <div class="stat-card fade-in-up stagger-3">
+            <div class="stat-card-header">
+              <div class="stat-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                >
+                  <path d="M23 6l-9.5 9.5-5-5L1 18"></path>
+                  <path d="M17 6h6v6"></path>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Best Month Performance</h3>
+              </div>
+            </div>
+            <div class="stat-value">72.0%</div>
+            <span class="stat-change">January 2025 - Highest reach rate</span>
+          </div>
+
+          <div class="stat-card fade-in-up stagger-4">
+            <div class="stat-card-header">
+              <div class="stat-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </div>
+              <div class="stat-info">
+                <h3>Delay: Busy Schedule</h3>
+              </div>
+            </div>
+            <div class="stat-value">33.3%</div>
+            <span class="stat-change">Top reason for delayed enrollment</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="section">
+        <div class="section-header fade-in-up">
+          <h2 class="section-title">Visual Performance Analytics</h2>
+          <p class="section-description">
+            Interactive data visualization telling the complete story
+          </p>
+        </div>
+
+        <!-- Top Charts Row -->
+        <div class="grid-2">
+          <div class="chart-wrapper slide-in-left">
+            <div class="chart-header">
+              <h3 class="chart-title">Monthly Comparison</h3>
+              <p class="chart-subtitle">Contact volume by month</p>
+            </div>
+            <div style="position: relative; height: 240px">
+              <canvas id="monthlyChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-wrapper slide-in-right">
+            <div class="chart-header">
+              <h3 class="chart-title">Campaign Distribution</h3>
+              <p class="chart-subtitle">
+                Breakdown by campaign type across period
+              </p>
+            </div>
+            <div style="position: relative; height: 240px">
+              <canvas id="campaignChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Chart - Full Width -->
+        <div style="margin-top: 24px">
+          <div class="chart-wrapper fade-in-up">
+            <div class="chart-header">
+              <h3 class="chart-title">Campaign Activity Timeline</h3>
+              <p class="chart-subtitle">
+                Daily outreach volume tracking across both months
+              </p>
+            </div>
+            <div style="position: relative; height: 220px">
+              <canvas id="timelineChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Charts Row -->
+        <div class="grid-2" style="margin-top: 24px">
+          <div class="chart-wrapper fade-in-up stagger-1">
+            <div class="chart-header">
+              <h3 class="chart-title">Program Performance</h3>
+              <p class="chart-subtitle">Learner contacts by program</p>
+            </div>
+            <div style="position: relative; height: 240px">
+              <canvas id="programChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-wrapper fade-in-up stagger-2">
+            <div class="chart-header">
+              <h3 class="chart-title">Geographic Reach</h3>
+              <p class="chart-subtitle">Distribution across Ethiopian cities</p>
+            </div>
+            <div style="position: relative; height: 240px">
+              <canvas id="geoChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Campaign Analysis -->
+      <div class="section">
+        <div class="section-header fade-in-up">
+          <h2 class="section-title">Campaign Performance Matrix</h2>
+          <p class="section-description">
+            Comprehensive breakdown of all campaign activities
+          </p>
+        </div>
+
+        <div class="card fade-in-up">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th>Total Calls</th>
+                  <th>Reached</th>
+                  <th>Reach Rate</th>
+                  <th>Interested</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>January 2025</strong></td>
+                  <td>9,656</td>
+                  <td>6,950</td>
+                  <td>72.0%</td>
+                  <td>35.5%</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 72%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-success">Excellent</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>February 2025</strong></td>
+                  <td>7,957</td>
+                  <td>5,552</td>
+                  <td>69.8%</td>
+                  <td>32.2%</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 70%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-success">Excellent</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>March 2025</strong></td>
+                  <td>9,123</td>
+                  <td>6,073</td>
+                  <td>66.6%</td>
+                  <td>30.0%</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 67%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-success">Strong</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>April 2025</strong></td>
+                  <td>10,605</td>
+                  <td>6,943</td>
+                  <td>65.5%</td>
+                  <td>15.7%</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 66%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-warning">Moderate</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>May 2025</strong></td>
+                  <td>3,061</td>
+                  <td>1,928</td>
+                  <td>63.0%</td>
+                  <td>-</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 63%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">Active</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>June 2025</strong></td>
+                  <td>6,215</td>
+                  <td>3,427</td>
+                  <td>55.1%</td>
+                  <td>-</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 55%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">Active</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>July 2025</strong></td>
+                  <td>25,046</td>
+                  <td>15,397</td>
+                  <td>61.5%</td>
+                  <td>0.1%</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 62%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">High Volume</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>August 2025</strong></td>
+                  <td>16,762</td>
+                  <td>9,987</td>
+                  <td>59.6%</td>
+                  <td>-</td>
+                  <td>
+                    <div class="progress-container">
+                      <div class="progress-bar" style="width: 60%"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">Active</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Program Analysis -->
+      <div class="section">
+        <div class="section-header fade-in-up">
+          <h2 class="section-title">Program-Level Intelligence</h2>
+          <p class="section-description">
+            Deep dive into program performance and engagement
+          </p>
+        </div>
+
+        <div class="card fade-in-up">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Call Outcome</th>
+                  <th>Total Count</th>
+                  <th>Percentage</th>
+                  <th>Status Type</th>
+                  <th>Contribution %</th>
+                  <th>Trend</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Reached</strong></td>
+                  <td>56,257</td>
+                  <td>63.6%</td>
+                  <td>Success</td>
+                  <td>63.6%</td>
+                  <td><span class="stat-change">↑ Strong Performance</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Not Picking Up</strong></td>
+                  <td>16,180</td>
+                  <td>18.3%</td>
+                  <td>Retry Needed</td>
+                  <td>18.3%</td>
+                  <td><span class="stat-change">⟳ Follow-up Required</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Phone Not Working</strong></td>
+                  <td>13,419</td>
+                  <td>15.2%</td>
+                  <td>Invalid</td>
+                  <td>15.2%</td>
+                  <td><span class="stat-change">⚠ Update Contact Info</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Busy</strong></td>
+                  <td>1,374</td>
+                  <td>1.6%</td>
+                  <td>Retry Later</td>
+                  <td>1.6%</td>
+                  <td><span class="stat-change">⟳ Callback</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Other</strong></td>
+                  <td>1,195</td>
+                  <td>1.4%</td>
+                  <td>Mixed</td>
+                  <td>1.4%</td>
+                  <td><span class="stat-change">— Various</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Insights -->
+      <div class="section">
+        <div class="section-header fade-in-up">
+          <h2 class="section-title">Key Insights</h2>
+          <p class="section-description">
+            Notable findings from the 8-month analysis period
+          </p>
+        </div>
+
+        <div class="insight-grid">
+          <div class="insight-card fade-in-up stagger-1">
+            <div class="insight-number">1</div>
+            <h3 class="insight-title">Exceptional Reach Rate</h3>
+            <p class="insight-text">
+              Out of a total of 88,425 calls made, 63.6% were successfully reached and spoken to. This demonstrates strong operational effectiveness and quality contact management.
+            </p>
+          </div>
+          <div class="insight-card fade-in-up stagger-2">
+            <div class="insight-number">2</div>
+            <h3 class="insight-title">Engagement Quality</h3>
+            <p class="insight-text">
+              Among those reached, 12.8% expressed continued interest, while 5.1% said they were still considering their options. This represents 10,028 engaged prospects ready for enrollment.
+            </p>
+          </div>
+          <div class="insight-card fade-in-up stagger-3">
+            <div class="insight-number">3</div>
+            <h3 class="insight-title">Top Delay Reason</h3>
+            <p class="insight-text">
+              The leading reason for delaying enrollment was having a busy schedule (33.3%), followed by forgetting about the application process (13.4%). Automated reminders and flexible scheduling could address these.
+            </p>
+          </div>
+          <div class="insight-card fade-in-up stagger-4">
+            <div class="insight-number">4</div>
+            <h3 class="insight-title">January Excellence</h3>
+            <p class="insight-text">
+              January achieved the highest reach rate of 72.0% with 35.5% interest among reached contacts. This month serves as the gold standard for operational quality and effectiveness.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey Timeline -->
+      <div class="section">
+        <div class="section-header fade-in-up">
+          <h2 class="section-title">Monthly Summary</h2>
+          <p class="section-description">Key activities by month</p>
+        </div>
+
+        <div class="card fade-in-up">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">January 2025 - Excellent Start</div>
+                <div class="timeline-text">
+                  Best performing month with 72.0% reach rate. Made 9,656 calls reaching 6,950 contacts. 35.5% expressed interest - highest engagement of the year.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">February 2025 - Strong Continuation</div>
+                <div class="timeline-text">
+                  Maintained excellence with 69.8% reach rate. Conducted 7,957 calls reaching 5,552 contacts. Interest rate at 32.2% showing consistent quality.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">March 2025 - Sustained Momentum</div>
+                <div class="timeline-text">
+                  Achieved 66.6% reach rate with 9,123 calls and 6,073 contacts reached. Interest at 30.0% demonstrating ongoing engagement strength.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">April 2025 - Volume Increase</div>
+                <div class="timeline-text">
+                  10,605 calls with 65.5% reach rate (6,943 reached). Interest dropped to 15.7%, indicating potential need for list quality review.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">May 2025 - Focused Operations</div>
+                <div class="timeline-text">
+                  Smaller scale with 3,061 calls, 63.0% reach rate (1,928 reached). Maintained solid reach effectiveness despite reduced volume.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">June 2025 - Recovery Phase</div>
+                <div class="timeline-text">
+                  6,215 calls with 55.1% reach rate (3,427 reached). Slight dip in reach rate, focus on quality improvement needed.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">July 2025 - High Volume Push</div>
+                <div class="timeline-text">
+                  Peak volume month with 25,046 calls. Reached 15,397 contacts (61.5%). Volume surge while maintaining above-60% reach rate.
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="timeline-title">August 2025 - Strong Finish</div>
+                <div class="timeline-text">
+                  16,762 calls with 59.6% reach rate (9,987 reached). Sustained high volume operations while maintaining solid performance.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div
+        style="
+          text-align: center;
+          padding: 40px 0;
+          color: var(--gray-500);
+          border-top: 2px solid var(--gray-200);
+          margin-top: 60px;
+        "
+      >
+        <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px">
+          © 2025 ALX Ethiopia Call Center Analytics
+        </p>
+        <p style="font-size: 14px">
+          Dashboard v3.0 • Generated November 26, 2025 • Next update: December
+          1, 2025
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Chart.js Configuration
+      Chart.defaults.font.family = "'Inter', sans-serif";
+      Chart.defaults.color = "#6b7280";
+
+      // Monthly Comparison
+      const monthlyCtx = document.getElementById("monthlyChart");
+      const monthlyGradient = monthlyCtx
+        .getContext("2d")
+        .createLinearGradient(0, 0, 0, 400);
+      monthlyGradient.addColorStop(0, "#3b82f6");
+      monthlyGradient.addColorStop(1, "#60a5fa");
+
+      new Chart(monthlyCtx, {
+        type: "bar",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
+          datasets: [
+            {
+              label: "Contacts Reached",
+              data: [6950, 5552, 6073, 6943, 1928, 3427, 15397, 9987],
+              backgroundColor: monthlyGradient,
+              borderRadius: 12,
+              borderWidth: 0,
+              barPercentage: 0.5,
+              categoryPercentage: 0.6,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              },
+              formatter: function(value) {
+                return value.toLocaleString();
+              }
+            },
+            tooltip: {
+              backgroundColor: "#1f2937",
+              padding: 12,
+              titleColor: "#fff",
+              bodyColor: "#fff",
+              borderColor: "#3b82f6",
+              borderWidth: 1,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: "#f3f4f6" },
+              border: { display: false },
+            },
+            x: {
+              grid: { display: false },
+              border: { display: false },
+            },
+          },
+        },
+      });
+
+      // Campaign Distribution
+      new Chart(document.getElementById("campaignChart"), {
+        type: "doughnut",
+        data: {
+          labels: [
+            "Reached",
+            "Not Picking Up",
+            "Phone Not Working",
+            "Busy",
+            "Other",
+          ],
+          datasets: [
+            {
+              data: [56257, 16180, 13419, 1374, 1195],
+              backgroundColor: [
+                "#3b82f6",
+                "#10b981",
+                "#f59e0b",
+                "#8b5cf6",
+                "#ef4444",
+                "#6366f1",
+              ],
+              borderWidth: 0,
+              hoverOffset: 15,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "70%",
+          plugins: {
+            legend: {
+              position: "right",
+              labels: { padding: 20, usePointStyle: true, font: { size: 13 } },
+            },
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 11
+              },
+              formatter: function(value, context) {
+                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return percentage + '%';
+              }
+            },
+          },
+        },
+      });
+
+      // Timeline
+      const timelineCtx = document.getElementById("timelineChart");
+      const timelineGradient = timelineCtx
+        .getContext("2d")
+        .createLinearGradient(0, 0, 0, 300);
+      timelineGradient.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+      timelineGradient.addColorStop(1, "rgba(59, 130, 246, 0)");
+
+      new Chart(timelineCtx, {
+        type: "line",
+        data: {
+          labels: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+          ],
+          datasets: [
+            {
+              label: "Reach Rate %",
+              data: [
+                72.0, 69.8, 66.6, 65.5, 63.0, 55.1, 61.5, 59.6,
+              ],
+              borderColor: "#3b82f6",
+              backgroundColor: timelineGradient,
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 5,
+              pointBackgroundColor: "#3b82f6",
+              pointBorderColor: "#fff",
+              pointBorderWidth: 3,
+              pointHoverRadius: 7,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              color: '#3b82f6',
+              font: {
+                weight: 'bold',
+                size: 11
+              },
+              align: 'top',
+              offset: 8,
+              formatter: function(value) {
+                return value + '%';
+              }
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: "#f3f4f6" },
+              border: { display: false },
+            },
+            x: {
+              grid: { color: "#f3f4f6" },
+              border: { display: false },
+              ticks: { maxRotation: 45, minRotation: 45 },
+            },
+          },
+        },
+      });
+
+      // Program Performance
+      new Chart(document.getElementById("programChart"), {
+        type: "bar",
+        data: {
+          labels: ["Interested", "Considering", "Not Interested"],
+          datasets: [
+            {
+              label: "Contact Count",
+              data: [7181, 2847, 7210],
+              backgroundColor: "#3b82f6",
+              borderRadius: 10,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: "y",
+          plugins: { 
+            legend: { display: false },
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 12
+              },
+              anchor: 'end',
+              align: 'start',
+              offset: 10,
+              formatter: function(value) {
+                return value.toLocaleString();
+              }
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { color: "#f3f4f6" },
+              border: { display: false },
+            },
+            y: {
+              grid: { display: false },
+              border: { display: false },
+            },
+          },
+        },
+      });
+
+      // Geography
+      new Chart(document.getElementById("geoChart"), {
+        type: "pie",
+        data: {
+          labels: [
+            "Busy Schedule",
+            "Forgot",
+            "Personal Circumstances",
+            "Other",
+          ],
+          datasets: [
+            {
+              data: [4267, 1721, 201, 6641],
+              backgroundColor: [
+                "#3b82f6",
+                "#10b981",
+                "#f59e0b",
+                "#8b5cf6",
+                "#ef4444",
+                "#6366f1",
+              ],
+              borderWidth: 3,
+              borderColor: "#fff",
+              hoverOffset: 12,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { padding: 15, usePointStyle: true },
+            },
+            datalabels: {
+              color: '#fff',
+              font: {
+                weight: 'bold',
+                size: 11
+              },
+              formatter: function(value, context) {
+                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return percentage + '%';
+              }
+            },
+          },
+        },
+      });
+
+      // Scroll Animation Observer
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = "running";
+          }
+        });
+      }, observerOptions);
+
+      document
+        .querySelectorAll(
+          ".fade-in-up, .slide-in-left, .slide-in-right, .scale-in"
+        )
+        .forEach((el) => {
+          el.style.animationPlayState = "paused";
+          observer.observe(el);
+        });
+    </script>
+  </body>
+</html>
